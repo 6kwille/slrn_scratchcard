@@ -1,83 +1,51 @@
-return {
-    debug = false, -- Enable debug command
-    cooldown = 3000, -- Time between opening scratchers
-    prizeArray = { -- list of prize squares, uses font awesome icon names without the fa- prefix
-        [1] = { icon = 'money-bill', amount = 2},
-        [2] = { icon = 'sack-dollar', amount = 5},
-        [3] = { icon = 'money-bill-1', amount = 1},
-        [4] = { icon = 'landmark', amount = 10},
-        [5] = { icon = 'wallet', amount = 20},
-        [6] = { icon = 'coins', amount = 20},
-        [7] = { icon = 'vault', amount = 100},
-        [8] = { icon = 'piggy-bank', amount = 50},
-        [9] = { icon = 'money-bill-wave', amount = 10},
-        [10] = { icon = 'money-bill-1-wave', amount = 5},
-        [11] = { icon = 'money-bill-transfer', amount = 25}
-    },
-    cardArray = { -- Card type definitions. Uses item metadata to determine card types.
-        sevenxseven = {
-            gridSizeX = 7, -- How big the grid is horizontally
-            gridSizeY = 7, -- How big the grid is vertically
-            winChance = 10, -- Percentage chance out of 100 to give a reward
-            multiplier = 8, -- Multiplier of base amount for reward
-            minWinSymbol = 10, -- Minimum number of symbols that will be awarded for winners
-            cardBgColor = '#00963C' -- Background color for card when generated.
-        },
-        sixxsix = {
-            gridSizeX = 6,
-            gridSizeY = 6,
-            winChance = 10,
-            multiplier = 7,
-            minWinSymbol = 10,
-            cardBgColor = '#00963C'
-        },
-        sixxfive = {
-            gridSizeX = 5,
-            gridSizeY = 6,
-            winChance = 10,
-            multiplier = 6,
-            minWinSymbol = 5,
-            cardBgColor = '#00963C'
-        },
-        fivexfive = {
-            gridSizeX = 5,
-            gridSizeY = 5,
-            winChance = 10,
-            multiplier = 5,
-            minWinSymbol = 5,
-            cardBgColor = '#1B1F3B'
-        },
-        fivexfour = {
-            gridSizeX = 5,
-            gridSizeY = 4,
-            winChance = 25,
-            multiplier = 4,
-            minWinSymbol = 4,
-            cardBgColor = '#CDC392'
-        },
-        fourxfour = {
-            gridSizeX = 4,
-            gridSizeY = 4,
-            winChance = 35,
-            multiplier = 3,
-            minWinSymbol = 4,
-            cardBgColor = '#B6DC76'
-        },
-        fourxthree = {
-            gridSizeX = 4,
-            gridSizeY = 3,
-            winChance = 45,
-            multiplier = 2,
-            minWinSymbol = 4,
-            cardBgColor = '#442B48'
-        },
-        threexthree = {
-            gridSizeX = 3,
-            gridSizeY = 3,
-            winChance = 45,
-            multiplier = 1,
-            minWinSymbol = 3,
-            cardBgColor = '#E7BB41'
-        },
+Config = {}
+
+Config.Debug = false -- Aktivera debug-kommandon
+Config.Cooldown = 3000 -- Tid mellan skrapningar i ms
+
+-- Svenska Triss-symboler (Font Awesome ikoner)
+Config.PrizeIcons = {
+    { icon = "clover", label = "Klöver" },
+    { icon = "crown", label = "Krona" },
+    { icon = "star", label = "Stjärna" },
+    { icon = "diamond", label = "Diamant" },
+    { icon = "horse-shoe", label = "Hästsko" },
+    { icon = "coins", label = "Mynt" }
+}
+
+-- Svenska vinstnivåer
+Config.PrizeAmounts = {
+    30,
+    60,
+    90,
+    120,
+    300,
+    1000,
+    10000,
+    100000,
+    1000000
+}
+
+Config.Settings = {
+    itemName = "trisslott", -- Namnet på item i inventory
+    isInventoryItem = true, -- Om det ska kräva ett item
+    winChance = 25, -- Chans att vinna (procent)
+    loseChance = 75, -- Chans att förlora (procent)
+    animation = {
+        dict = "amb@world_human_seat_wall_eating@pizzabox@male@base",
+        anim = "base",
+        prop = "p_amb_pizzabox_01" -- Exempel, du kan byta till en lott-prop om du har
+    }
+}
+
+Config.CardArray = {
+    triss = {
+        label = "Trisslott",
+        gridSizeX = 3,
+        gridSizeY = 3,
+        winChance = 25,
+        minWinSymbol = 3,
+        cardBgColor = "#ffcc00", -- Gul färg för Triss
+        stripeColor = "#005596" -- Blå färg för Triss
     }
 }

@@ -1,9 +1,8 @@
 fx_version "cerulean"
 
-description "Solareon Scratchcard"
-author "solareon."
-version '1.0.5'
-repository 'https://github.com/solareon/slrn_scratchcard'
+description "Trisslott System - Svenska Spel Tema"
+author "SwisserAI"
+version '1.0.0'
 
 lua54 'yes'
 
@@ -11,14 +10,18 @@ games {
   "gta5",
 }
 
-ui_page 'web/build/index.html'
+ui_page 'html/ui.html'
 
-client_script "client/**/*"
-server_script "server/**/*"
+client_script "client/client.lua"
+client_script "client/utils.lua"
+server_script "server/server.lua"
+server_script "server/version.lua"
+shared_script "config/server.lua"
 shared_script "@ox_lib/init.lua"
 
 files {
-	'web/build/index.html',
-	'web/build/**/*',
-  'images/**/*'
+	'html/ui.html',
+	'html/style.css',
+	'html/script.js',
+    'html/assets/*.png'
 }

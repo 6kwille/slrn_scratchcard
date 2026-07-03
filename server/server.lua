@@ -1,98 +1,120 @@
-if not lib then return end
-
-if GetCurrentResourceName() ~= 'slrn_scratchcard' then
-    lib.print.error('The resource needs to be named ^5slrn_scratchcard^7.')
-    return
-end
-
-local config = require 'config.server'
-
 local playerData = {}
 
+-- Funktion för att skapa en trisslott-data
 local function createScratcher(src, scratcherIndex)
     if not src then return end
 
-    local prizeArray = lib.table.deepclone(config.prizeArray)
-    local prizeConfig = config.cardArray[scratcherIndex]
-    local prizeSquares = prizeConfig.gridSizeX * prizeConfig.gridSizeY
-    local winningSymbol = math.random(#prizeArray)
-    local prizeData = {}
-    local winner = math.random(100) <= prizeConfig.winChance and true or false
-    local prizeAmount = 0
-    if winner then
-        for _ = 1, prizeConfig.minWinSymbol do
-            prizeData[#prizeData + 1] = prizeArray[winningSymbol]
-            prizeData[#prizeData].color = 'gold'
-            prizeAmount = prizeAmount + (prizeArray[winningSymbol].amount * prizeConfig.multiplier)
-        end
-        prizeSquares = prizeSquares - prizeConfig.minWinSymbol
-    end
-    for _ = 1, prizeSquares do
-        prizeData[#prizeData + 1] = prizeArray[math.random(#prizeArray)]
-        if prizeData[#prizeData].color == 'gold' then
-            prizeAmount = prizeAmount + (prizeArray[winningSymbol].amount * prizeConfig.multiplier)
-        end
-    end
-    playerData[src].prizeAmount = prizeAmount
+    local cardConfig = Config.CardArray[scratcherIndex]
+    if not cardConfig then return end
 
-    local cardData = {}
-    cardData.gridSizeX = prizeConfig.gridSizeX
-    cardData.gridSizeY = prizeConfig.gridSizeY
-    cardData.cardBgColor = prizeConfig.cardBgColor
+    local prizeSquares = cardConfig.gridSizeX * cardConfig.gridSizeY
+    local prizeData = {}
+    local winner = math.random(100) <= cardConfig.winChance
+    local winningAmount = 0
+    
+    if winner then
+        winningAmount = Config.PrizeAmounts[math.random(#Config.PrizeAmounts)]
+        -- Lägg till 3 vinnande rutor
+        for i = 1, 3 do
+            table.insert(prizeData, {
+                amount = winningAmount,
+                icon = Config.PrizeIcons[math.random(#Config.PrizeIcons)].icon,
+                isWinner = true
+            })
+        end
+        prizeSquares = prizeSquares - 3
+    end
+
+    -- Fyll resten med slumpmässiga (icke-vinnande) belopp
+    for i = 1, prizeSquares do
+        local randomAmount = Config.PrizeAmounts[math.random(#Config.PrizeAmounts)]
+        -- Se till att vi inte råkar skapa 3 av samma om vi inte ska vinna
+        if randomAmount == winningAmount and not winner then
+            randomAmount = Config.PrizeAmounts[1] == winningAmount and Config.PrizeAmounts[2] or Config.PrizeAmounts[1]
+        end
+
+        table.insert(prizeData, {
+            amount = randomAmount,
+            icon = Config.PrizeIcons[math.random(#Config.PrizeIcons)].icon,
+            isWinner = false
+        })
+    end
+
+    -- Blanda tabellen så vinsterna inte alltid ligger först
+    for i = #prizeData, 2, -1 do
+        local j = math.random(i)
+        prizeData[i], prizeData[j] = prizeData[j], prizeData[i]
+    end
+
+    playerData[src] = {
+        prizeAmount = winner and winningAmount or 0,
+        scratcherType = scratcherIndex,
+        isFinished = false
+    }
+
+    local cardData = {
+        gridSizeX = cardConfig.gridSizeX,
+        gridSizeY = cardConfig.gridSizeY,
+        cardBgColor = cardConfig.cardBgColor,
+        stripeColor = cardConfig.stripeColor,
+        label = cardConfig.label
+    }
 
     TriggerClientEvent('slrn_scratchcard:client:openScratcher', src, prizeData, cardData)
 end
 
-exports('scratcher', function(event, _, inventory, slot, _)
+-- Export för ox_inventory
+exports('scratcher', function(event, item, inventory, slot, data)
     if event == 'usingItem' then
-        if not playerData[inventory.id] then
-            playerData[inventory.id] = {}
-        end
-        if playerData[inventory.id].playerCooldown then
-            DoNotification(inventory.id, 'You are scratching too fast!', 'error')
+        local src = inventory.id
+        if playerData[src] and playerData[src].playerCooldown then
+            DoNotification(src, 'Du skrapar för snabbt!', 'error')
             return false
         end
-        local itemInfo = exports.ox_inventory:GetSlot(inventory.id, slot)
-        if itemInfo then
-            playerData[inventory.id].scratcherType = itemInfo.metadata.scratcherType
-            return true
-        end
+        return true
     end
 
     if event == 'usedItem' then
-        if playerData[inventory.id].scratcherType then
-            createScratcher(inventory.id, playerData[inventory.id].scratcherType)
-            playerData[inventory.id].playerCooldown = true
-            SetTimeout(3000, function()
-                playerData[inventory.id].playerCooldown = false
-            end)
-        end
-        return
+        local src = inventory.id
+        createScratcher(src, 'triss')
+        playerData[src].playerCooldown = true
+        SetTimeout(Config.Cooldown, function()
+            if playerData[src] then
+                playerData[src].playerCooldown = false
+            end
+        end)
     end
 end)
 
-RegisterNetEvent('slrn_scratchcard:server:getPrize', function ()
+-- Event när spelaren har skrapat klart
+RegisterNetEvent('slrn_scratchcard:server:getPrize', function()
     local src = source
-    if not playerData[src].prizeAmount or not src then return end
-    local success = playerData[src].prizeAmount > 0 and 'success' or 'error'
-    local message = 'You got $%s from the scratcher!'
-    DoNotification(src, (message):format(playerData[src].prizeAmount), success)
-    if success then
+    if not playerData[src] or playerData[src].isFinished then return end
+    
+    playerData[src].isFinished = true
+    local prize = playerData[src].prizeAmount
+
+    if prize > 0 then
+        local message = ("Grattis! Du vann %s SEK på din Trisslott!"):format(prize)
+        DoNotification(src, message, 'success')
+        
         local player = GetPlayer(src)
-        AddMoney(player, 'cash', playerData[src].prizeAmount)
+        if player then
+            AddMoney(player, 'cash', prize)
+        end
+    else
+        DoNotification(src, "Tyvärr, ingen vinst denna gång. Plötsligt händer det!", 'error')
     end
-    playerData[src].prizeAmount = 0
+    
+    -- Rensa data efter en liten stund
+    SetTimeout(5000, function()
+        playerData[src] = nil
+    end)
 end)
 
-if config.debug then
-    lib.addCommand('getscratcher', {
-        help = 'Get a scratch card (admin only)',
-        params = {
-            { name = 'cardtype', help = 'threexthree' }
-        },
-        restricted = "group.admin"
-    }, function(source, args)
-        if not args then return end
-        createScratcher(source, args.cardtype)
-    end)
+-- Debug kommando
+if Config.Debug then
+    RegisterCommand('testtriss', function(source, args)
+        createScratcher(source, 'triss')
+    end, true)
 end

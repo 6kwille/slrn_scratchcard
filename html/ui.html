@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trisslott</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-transparent overflow-hidden h-screen w-screen flex items-center justify-center opacity-0 transition-opacity duration-300">
+    
+    <div id="card-container" class="relative bg-[#ffcc00] w-[400px] rounded-2xl shadow-2xl border-8 border-[#005596] p-6 select-none overflow-hidden">
+        <!-- Triss Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="bg-[#005596] text-white px-4 py-1 rounded-full font-black italic text-2xl tracking-tighter shadow-md">
+                TRISS
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-bold text-[#005596] uppercase leading-none">Plötsligt händer det!</p>
+                <p class="text-[8px] text-black font-medium opacity-70">Svenska Spel</p>
+            </div>
+        </div>
+
+        <!-- Grid Container -->
+        <div id="scratch-grid" class="grid grid-cols-3 gap-3 bg-[#005596]/10 p-4 rounded-xl border-4 border-[#005596]/20">
+            <!-- Rutor genereras här via JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 flex justify-between items-end border-t-2 border-[#005596]/20 pt-4">
+            <div class="space-y-1">
+                <div class="w-16 h-4 bg-black/10 rounded"></div>
+                <div class="w-24 h-4 bg-black/10 rounded"></div>
+            </div>
+            <button id="close-btn" class="bg-[#005596] hover:bg-[#00447a] text-white px-4 py-2 rounded-lg font-bold text-xs transition-colors shadow-lg">
+                STÄNG
+            </button>
+        </div>
+
+        <!-- Background Details -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#005596]/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-[#005596]/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
