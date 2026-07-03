@@ -1,7 +1,7 @@
 fx_version "cerulean"
 
 description "Trisslott System - Svenska Spel Tema"
-author "SwisserAI"
+author "0ph6"
 version '1.0.0'
 
 lua54 'yes'
