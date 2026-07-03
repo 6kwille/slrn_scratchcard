@@ -37,6 +37,4 @@ Du kan ändra vinstchanser, symboler och belopp i `config/server.lua`.
 * **Säkerhet:** Alla vinstberäkningar och utbetalningar sker på serversidan för att förhindra fusk.
 * **Ljud & Animationer:** Kan konfigureras i inställningarna.
 
-## Support
-Skapat av SwisserAI för din FiveM-server.
-https://ai.swisser.dev
+
